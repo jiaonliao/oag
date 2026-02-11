@@ -1,0 +1,12 @@
+{
+  "name": "frontend-design",
+  "type": "skill",
+  "files": [
+    {
+      "source": "SKILL.md"
+    },
+    {
+      "source": "LICENSE.txt"
+    }
+  ]
+}

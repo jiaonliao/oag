@@ -1,0 +1,11 @@
+{
+  "name": "crknife-java-agent",
+  "type": "agent",
+  "description": "CRKnife Java 开发 Agent",
+  "tools": ["claude", "codex"],
+  "files": [
+    {
+      "source": "AGENT.md"
+    }
+  ]
+}

@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OAG Asset Showcase</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github-dark.min.css"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="top-console-bar" aria-label="Console overview">
+        <div class="brand-block">
+          <p class="eyebrow">OAG Registry Explorer</p>
+          <h1>Asset Control Station</h1>
+          <p class="headline-copy">Inspect, filter, and preview assets in a focused dark-mode control console.</p>
+        </div>
+
+        <dl class="status-metrics" aria-label="Build metadata">
+          <div class="metric-item">
+            <dt>Generated</dt>
+            <dd id="generatedAt">-</dd>
+          </div>
+          <div class="metric-item">
+            <dt>Visible</dt>
+            <dd id="visibleCount">0</dd>
+          </div>
+          <div class="metric-item">
+            <dt>Filter</dt>
+            <dd id="activeFilter">All</dd>
+          </div>
+        </dl>
+
+        <button id="resetFiltersBtn" class="reset-btn" type="button">Reset filters</button>
+      </header>
+
+      <main class="console-grid" aria-label="Asset console workspace">
+        <aside class="control-dock" aria-label="Filters and stats">
+          <section class="dock-panel search-panel">
+            <label class="panel-label" for="searchInput">Search assets</label>
+            <input
+              id="searchInput"
+              type="search"
+              placeholder="name, description, tool, directory, file"
+              autocomplete="off"
+            />
+            <p class="panel-note">Search updates instantly across all indexed fields. Press / to focus, Esc to reset.</p>
+          </section>
+
+          <section class="dock-panel filter-panel" role="radiogroup" aria-label="Asset type filter">
+            <p class="panel-label">Type filter</p>
+            <div class="filter-grid">
+              <button class="filter-btn is-active" type="button" data-type="all" aria-pressed="true">
+                <span class="filter-text">All</span>
+                <span id="filterCountAll" class="filter-count">0</span>
+              </button>
+              <button class="filter-btn" type="button" data-type="agent" aria-pressed="false">
+                <span class="filter-text">Agent</span>
+                <span id="filterCountAgent" class="filter-count">0</span>
+              </button>
+              <button class="filter-btn" type="button" data-type="skill" aria-pressed="false">
+                <span class="filter-text">Skill</span>
+                <span id="filterCountSkill" class="filter-count">0</span>
+              </button>
+              <button class="filter-btn" type="button" data-type="mcp" aria-pressed="false">
+                <span class="filter-text">MCP</span>
+                <span id="filterCountMcp" class="filter-count">0</span>
+              </button>
+            </div>
+          </section>
+
+          <section class="dock-panel stats-panel" aria-label="Asset counts">
+            <p class="panel-label">Registry stats</p>
+            <div class="stats-grid">
+              <article class="stat-card stat-card-total">
+                <p class="stat-label">Total</p>
+                <p id="totalStat" class="stat-value">0</p>
+              </article>
+              <article class="stat-card stat-card-agent">
+                <p class="stat-label">Agents</p>
+                <p id="agentStat" class="stat-value">0</p>
+              </article>
+              <article class="stat-card stat-card-skill">
+                <p class="stat-label">Skills</p>
+                <p id="skillStat" class="stat-value">0</p>
+              </article>
+              <article class="stat-card stat-card-mcp">
+                <p class="stat-label">MCP</p>
+                <p id="mcpStat" class="stat-value">0</p>
+              </article>
+            </div>
+          </section>
+        </aside>
+
+        <section class="asset-stage">
+          <header class="asset-stage-head">
+            <div>
+              <p class="eyebrow">Asset Gallery</p>
+              <h2>Registry Assets</h2>
+            </div>
+            <p id="resultSummary" class="result-summary" aria-live="polite">Showing 0 assets</p>
+          </header>
+
+          <section class="card-grid-wrap" aria-live="polite">
+            <div id="assetGrid" class="card-grid"></div>
+            <div id="emptyState" class="empty-state" hidden>
+              <h3>No assets found</h3>
+              <p>Try another keyword or reset the active filters.</p>
+              <button id="emptyResetBtn" type="button">Reset filters</button>
+            </div>
+          </section>
+        </section>
+      </main>
+    </div>
+
+    <div
+      id="assetDetailView"
+      class="detail-view"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="detailTitle"
+      hidden
+    >
+      <div id="detailScrim" class="detail-scrim" aria-hidden="true"></div>
+
+      <div class="detail-panel">
+        <header class="detail-head">
+          <div>
+            <p class="eyebrow">Asset Detail</p>
+            <h2 id="detailTitle">-</h2>
+            <p id="detailSubtitle" class="detail-subtitle">-</p>
+          </div>
+          <button id="closeDetailBtn" type="button" class="detail-close-btn">Close panel</button>
+        </header>
+
+        <section class="detail-meta" aria-label="Asset metadata">
+          <article class="meta-item">
+            <p class="meta-label">ID</p>
+            <p id="detailAssetId" class="meta-value">-</p>
+          </article>
+          <article class="meta-item">
+            <p class="meta-label">Directory</p>
+            <p id="detailAssetDir" class="meta-value mono">-</p>
+          </article>
+          <article class="meta-item">
+            <p class="meta-label">Tools</p>
+            <p id="detailAssetTools" class="meta-value">-</p>
+          </article>
+          <article class="meta-item meta-item-wide">
+            <p class="meta-label">Description</p>
+            <p id="detailAssetDescription" class="meta-value">-</p>
+          </article>
+        </section>
+
+        <section class="detail-content" aria-label="Asset files and preview">
+          <aside class="detail-files">
+            <div class="detail-section-head">
+              <h3>Files</h3>
+              <p id="detailFileCount" class="detail-count">0 total</p>
+            </div>
+            <ul id="detailFileList" class="detail-file-list"></ul>
+          </aside>
+
+          <section class="detail-preview">
+            <div class="detail-section-head">
+              <h3 id="detailPreviewTitle">Select a file</h3>
+              <p id="detailPreviewMeta" class="detail-count">Choose a file from the list.</p>
+            </div>
+
+            <p id="detailPreviewNotice" class="preview-notice" hidden></p>
+            <pre id="detailPreviewCode" class="preview-code" hidden><code id="detailPreviewCodeContent"></code></pre>
+            <pre id="detailPreviewFallback" class="preview-fallback" hidden></pre>
+            <article id="detailPreviewMarkdown" class="preview-markdown" hidden></article>
+          </section>
+        </section>
+      </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/languages/markdown.min.js"></script>
+    <script src="./app.js"></script>
+  </body>
+</html>

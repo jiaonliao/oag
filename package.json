@@ -1,0 +1,21 @@
+{
+  "name": "oag",
+  "version": "0.1.0",
+  "description": "AI CLI prompt registry manager",
+  "license": "Apache-2.0",
+  "main": "src/cli.js",
+  "bin": {
+    "oag": "bin/oag.js"
+  },
+  "scripts": {
+    "start": "node bin/oag.js",
+    "build:pages:data": "node scripts/build-pages-data.js",
+    "test": "node --test",
+    "preview:pages": "node scripts/preview-pages.js"
+  },
+  "dependencies": {
+    "commander": "^11.1.0",
+    "inquirer": "^8.2.6",
+    "@iarna/toml": "^3.0.0"
+  }
+}

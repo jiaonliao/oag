@@ -1,0 +1,10 @@
+{
+  "name": "context7",
+  "type": "mcp",
+  "description": "Context7 MCP server",
+  "tools": ["claude", "codex"],
+  "files": [
+    { "source": "mcp.json" }
+  ]
+}
+

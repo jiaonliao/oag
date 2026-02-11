@@ -1,0 +1,8 @@
+{
+  "name": "commit",
+  "type": "skill",
+  "files": [
+    { "source": "SKILL.md" },
+    { "source": "references/conventional-commits.md" }
+  ]
+}

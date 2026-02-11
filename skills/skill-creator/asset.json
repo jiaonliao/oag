@@ -1,0 +1,13 @@
+{
+  "name": "skill-creator",
+  "type": "skill",
+  "files": [
+    { "source": "SKILL.md" },
+    { "source": "LICENSE.txt" },
+    { "source": "references/output-patterns.md" },
+    { "source": "references/workflows.md" },
+    { "source": "scripts/init_skill.py" },
+    { "source": "scripts/package_skill.py" },
+    { "source": "scripts/quick_validate.py" }
+  ]
+}

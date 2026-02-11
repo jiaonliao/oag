@@ -1,0 +1,9 @@
+{
+  "name": "chrome-devtools",
+  "type": "mcp",
+  "description": "Chrome DevTools MCP server",
+  "tools": ["claude", "codex"],
+  "files": [
+    { "source": "mcp.json" }
+  ]
+}
