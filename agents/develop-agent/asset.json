@@ -1,7 +1,7 @@
 {
-  "name": "crknife-java-agent",
+  "name": "develop-agent",
   "type": "agent",
-  "description": "CRKnife Java 开发 Agent",
+  "description": "通用开发 Agent",
   "tools": ["claude", "codex"],
   "files": [
     {
