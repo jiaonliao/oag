@@ -24,6 +24,7 @@
   - Claude
   - Codex
 - **Interactive selection UI** in `oag install`.
+- **Preset-based reconcile install** via `oag preset`.
 - **State-based updates** with `oag update`.
 - **MCP support** with format handling:
   - Claude: `.mcp.json`
@@ -72,7 +73,7 @@ Minimal config (recommended):
 Notes:
 
 - Tool path mappings are built into `oag` (not loaded from user config).
-- If no remote is configured, `list` / `install` / `update` will prompt for it.
+- If no remote is configured, `list` / `list-presets` / `install` / `preset` / `update` will prompt for it.
 
 ## Quick start (with fork workflow)
 
@@ -89,13 +90,25 @@ Notes:
    oag list --tool claude
    ```
 
-4. **Install assets interactively**:
+4. **List available presets**:
+
+   ```bash
+   oag list-presets --tool claude
+   ```
+
+5. **Install assets interactively**:
 
    ```bash
    oag install --tool claude --mode copy
    ```
 
-5. **Update installed assets later**:
+6. **Apply a preset directly**:
+
+   ```bash
+   oag preset --tool claude --name oag-starter --mode copy
+   ```
+
+7. **Update installed assets later**:
 
    ```bash
    oag update
@@ -144,6 +157,37 @@ Example:
 oag install --tool codex --project . --mode symlink
 ```
 
+### `oag list-presets [--tool <name>]`
+
+List preset templates from the synced registry.
+
+Options:
+
+- `--tool <name>`: show only presets that define this tool
+
+Example:
+
+```bash
+oag list-presets --tool codex
+```
+
+### `oag preset [--name <preset>] [--tool <name>] [--project <path>] [--mode <mode>]`
+
+Apply one preset and reconcile managed assets to exactly the preset set.
+
+Options:
+
+- `--name <preset>`: preset name (if omitted, choose interactively)
+- `--tool <name>`: target tool (if omitted, choose interactively)
+- `--project <path>`: project root (default: current directory)
+- `--mode <mode>`: `copy` or `symlink` (default: `copy`)
+
+Example:
+
+```bash
+oag preset --name oag-starter --tool codex --project . --mode copy
+```
+
 ### `oag update [--tool <name>] [--project <path>] [--mode <mode>]`
 
 Reinstall/update items already recorded in project state.
@@ -164,7 +208,7 @@ oag update --tool claude
 
 ### 1) Registry sync
 
-Before `list`, `install`, and `update`, `oag` syncs your configured registry:
+Before `list`, `list-presets`, `install`, `preset`, and `update`, `oag` syncs your configured registry:
 
 - first run: clone into `~/.oag/registry/repo` (or your custom `registryPath`)
 - later runs: fetch remote, hard reset to configured branch, clean untracked files
@@ -195,6 +239,44 @@ Installed results are tracked in:
 
 State is used by `update` to know what should be refreshed and where.
 
+## Preset file format
+
+Preset files live under `presets/*.json` in your registry repo.
+
+Example:
+
+```json
+{
+  "name": "oag-starter",
+  "description": "Project starter preset for oag (codex + claude)",
+  "tools": {
+    "codex": [
+      "agent/develop-agent",
+      "mcp/context7",
+      "mcp/chrome-devtools",
+      "skill/commit",
+      "skill/frontend-design",
+      "skill/skill-creator"
+    ],
+    "claude": [
+      "agent/develop-agent",
+      "mcp/context7",
+      "mcp/chrome-devtools",
+      "skill/commit",
+      "skill/frontend-design",
+      "skill/skill-creator"
+    ]
+  }
+}
+```
+
+Notes:
+
+- Asset IDs use `type/name` format.
+- `name` and `tools` are required; `description` is optional.
+- `tools` must define at least one tool, and each `tools.<tool>` value must be a string array.
+- `oag preset` is strict: if any preset asset is missing/unsupported/unmapped for the selected tool, the command fails instead of partially applying.
+
 ## MCP notes
 
 For `mcp` assets, `oag` applies config updates instead of simple file copies:
@@ -213,3 +295,11 @@ For `mcp` assets, `oag` applies config updates instead of simple file copies:
   - Use a built-in tool name (`claude` or `codex`).
 - **Error: `Invalid mode '<mode>'. Use symlink or copy.`**
   - Choose `--mode copy` or `--mode symlink`.
+- **Error: `Preset '<name>' not found`**
+  - Check whether the preset exists under `presets/*.json` and the `name` matches your argument.
+- **Error: `Preset '<name>' does not define assets for tool '<tool>'`**
+  - Add the target tool key (for example `codex` or `claude`) under `tools`.
+- **Error: `Invalid preset: ... (invalid asset ID '...', expected type/name)`**
+  - Use `type/name` format for each asset ID (for example `skill/commit`).
+- **Error: `Preset '<name>' has invalid assets for tool '<tool>'`**
+  - Fix the reported items: missing asset, tool mismatch, or missing path mapping.
